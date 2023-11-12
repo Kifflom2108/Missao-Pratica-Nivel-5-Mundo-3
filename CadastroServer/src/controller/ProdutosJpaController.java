@@ -1,34 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import controller.exceptions.NonexistentEntityException;
 import java.io.Serializable;
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import model.Movimentos;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import model.Movimentos;
 import model.Produtos;
 
-/**
- *
- * @author felip
- */
 public class ProdutosJpaController implements Serializable {
+
+    private final EntityManagerFactory emf;
 
     public ProdutosJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    
-        public List<Produtos> getProdutos() {
+
+    public EntityManager getEntityManager() {
+        return emf.createEntityManager();
+    }
+
+    public List<Produtos> getProdutos() {
         EntityManager em = getEntityManager();
         try {
             Query query = em.createQuery("SELECT p FROM Produtos p");
@@ -37,11 +35,14 @@ public class ProdutosJpaController implements Serializable {
             em.close();
         }
     }
-    
-    private EntityManagerFactory emf = null;
 
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
+    public Produtos getProdutoById(Integer id) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.find(Produtos.class, id);
+        } finally {
+            em.close();
+        }
     }
 
     public void create(Produtos produtos) {
@@ -197,5 +198,4 @@ public class ProdutosJpaController implements Serializable {
             em.close();
         }
     }
-    
 }

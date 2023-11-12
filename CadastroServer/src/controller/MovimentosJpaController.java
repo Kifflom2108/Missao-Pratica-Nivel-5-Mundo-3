@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import controller.exceptions.NonexistentEntityException;
@@ -9,24 +5,21 @@ import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import model.Movimentos;
 import model.Produtos;
 import model.Usuarios;
 
-/**
- *
- * @author felip
- */
 public class MovimentosJpaController implements Serializable {
+
+    private final EntityManagerFactory emf;
 
     public MovimentosJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -61,6 +54,30 @@ public class MovimentosJpaController implements Serializable {
             if (em != null) {
                 em.close();
             }
+        }
+    }
+
+    public void incrementarQuantidade(int idProduto, int quantidade) {
+        EntityManager em = getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Produtos produto = em.find(Produtos.class, idProduto);
+            produto.setQuantidadeProdutos(produto.getQuantidadeProdutos() + quantidade);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+
+    public void decrementarQuantidade(int idProduto, int quantidade) {
+        EntityManager em = getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Produtos produto = em.find(Produtos.class, idProduto);
+            produto.setQuantidadeProdutos(produto.getQuantidadeProdutos() - quantidade);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
     }
 
@@ -192,5 +209,4 @@ public class MovimentosJpaController implements Serializable {
             em.close();
         }
     }
-    
 }

@@ -2,24 +2,26 @@ package controller;
 
 import controller.exceptions.NonexistentEntityException;
 import java.io.Serializable;
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import model.Movimentos;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import model.Movimentos;
 import model.Usuarios;
 
 public class UsuariosJpaController implements Serializable {
 
+    private final EntityManagerFactory emf;
+
     public UsuariosJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    
+
     public Usuarios findUsuario(String login, String senha) {
         EntityManager em = getEntityManager();
         try {
@@ -35,11 +37,14 @@ public class UsuariosJpaController implements Serializable {
             em.close();
         }
     }
-    
-    private EntityManagerFactory emf = null;
 
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
+    public Usuarios findUsuarioById(int id) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.find(Usuarios.class, id);
+        } finally {
+            em.close();
+        }
     }
 
     public void create(Usuarios usuarios) {
@@ -79,40 +84,13 @@ public class UsuariosJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Usuarios persistentUsuarios = em.find(Usuarios.class, usuarios.getIdUsuarios());
-            Collection<Movimentos> movimentosCollectionOld = persistentUsuarios.getMovimentosCollection();
-            Collection<Movimentos> movimentosCollectionNew = usuarios.getMovimentosCollection();
-            Collection<Movimentos> attachedMovimentosCollectionNew = new ArrayList<Movimentos>();
-            for (Movimentos movimentosCollectionNewMovimentosToAttach : movimentosCollectionNew) {
-                movimentosCollectionNewMovimentosToAttach = em.getReference(movimentosCollectionNewMovimentosToAttach.getClass(), movimentosCollectionNewMovimentosToAttach.getIdMovimento());
-                attachedMovimentosCollectionNew.add(movimentosCollectionNewMovimentosToAttach);
-            }
-            movimentosCollectionNew = attachedMovimentosCollectionNew;
-            usuarios.setMovimentosCollection(movimentosCollectionNew);
             usuarios = em.merge(usuarios);
-            for (Movimentos movimentosCollectionOldMovimentos : movimentosCollectionOld) {
-                if (!movimentosCollectionNew.contains(movimentosCollectionOldMovimentos)) {
-                    movimentosCollectionOldMovimentos.setOperadorID(null);
-                    movimentosCollectionOldMovimentos = em.merge(movimentosCollectionOldMovimentos);
-                }
-            }
-            for (Movimentos movimentosCollectionNewMovimentos : movimentosCollectionNew) {
-                if (!movimentosCollectionOld.contains(movimentosCollectionNewMovimentos)) {
-                    Usuarios oldOperadorIDOfMovimentosCollectionNewMovimentos = movimentosCollectionNewMovimentos.getOperadorID();
-                    movimentosCollectionNewMovimentos.setOperadorID(usuarios);
-                    movimentosCollectionNewMovimentos = em.merge(movimentosCollectionNewMovimentos);
-                    if (oldOperadorIDOfMovimentosCollectionNewMovimentos != null && !oldOperadorIDOfMovimentosCollectionNewMovimentos.equals(usuarios)) {
-                        oldOperadorIDOfMovimentosCollectionNewMovimentos.getMovimentosCollection().remove(movimentosCollectionNewMovimentos);
-                        oldOperadorIDOfMovimentosCollectionNewMovimentos = em.merge(oldOperadorIDOfMovimentosCollectionNewMovimentos);
-                    }
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = usuarios.getIdUsuarios();
-                if (findUsuarios(id) == null) {
+                int id = usuarios.getIdUsuarios();
+                if (findUsuarioById(id) == null) {
                     throw new NonexistentEntityException("The usuarios with id " + id + " no longer exists.");
                 }
             }
@@ -124,7 +102,7 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+    public void destroy(int id) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -174,15 +152,6 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public Usuarios findUsuarios(Integer id) {
-        EntityManager em = getEntityManager();
-        try {
-            return em.find(Usuarios.class, id);
-        } finally {
-            em.close();
-        }
-    }
-
     public int getUsuariosCount() {
         EntityManager em = getEntityManager();
         try {
@@ -195,5 +164,8 @@ public class UsuariosJpaController implements Serializable {
             em.close();
         }
     }
-    
+
+    public EntityManager getEntityManager() {
+        return emf.createEntityManager();
+    }
 }

@@ -37,11 +37,11 @@ public class Produtos implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "idProdutos")
-    private Integer idProdutos;
+    private int idProdutos;
     @Column(name = "NomeProdutos")
     private String nomeProdutos;
     @Column(name = "QuantidadeProdutos")
-    private Integer quantidadeProdutos;
+    private int quantidadeProdutos;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "Pre\u00e7oProdutos")
     private BigDecimal preçoProdutos;
@@ -51,15 +51,15 @@ public class Produtos implements Serializable {
     public Produtos() {
     }
 
-    public Produtos(Integer idProdutos) {
+    public Produtos(int idProdutos) {
         this.idProdutos = idProdutos;
     }
 
-    public Integer getIdProdutos() {
+    public int getIdProdutos() {
         return idProdutos;
     }
 
-    public void setIdProdutos(Integer idProdutos) {
+    public void setIdProdutos(int idProdutos) {
         this.idProdutos = idProdutos;
     }
 
@@ -71,11 +71,11 @@ public class Produtos implements Serializable {
         this.nomeProdutos = nomeProdutos;
     }
 
-    public Integer getQuantidadeProdutos() {
+    public int getQuantidadeProdutos() {
         return quantidadeProdutos;
     }
 
-    public void setQuantidadeProdutos(Integer quantidadeProdutos) {
+    public void setQuantidadeProdutos(int quantidadeProdutos) {
         this.quantidadeProdutos = quantidadeProdutos;
     }
 
@@ -98,20 +98,20 @@ public class Produtos implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (idProdutos != null ? idProdutos.hashCode() : 0);
+        hash += idProdutos;
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Produtos)) {
             return false;
         }
         Produtos other = (Produtos) object;
-        if ((this.idProdutos == null && other.idProdutos != null) || (this.idProdutos != null && !this.idProdutos.equals(other.idProdutos))) {
+        if (this.idProdutos != other.idProdutos) {
             return false;
         }
+
         return true;
     }
 
@@ -119,5 +119,5 @@ public class Produtos implements Serializable {
     public String toString() {
         return "model.Produtos[ idProdutos=" + idProdutos + " ]";
     }
-    
+
 }

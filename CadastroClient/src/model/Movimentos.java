@@ -102,6 +102,7 @@ public class Movimentos implements Serializable {
     public Usuarios getOperadorID() {
         return operadorID;
     }
+    
 
     public void setOperadorID(Usuarios operadorID) {
         this.operadorID = operadorID;

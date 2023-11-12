@@ -1,5 +1,6 @@
 package cadastroserver;
 
+import controller.MovimentosJpaController;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,8 +15,9 @@ public class ServidorCadastro {
         
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("CadastroServerPU");
         
-        ProdutosJpaController ctrlProdutos = new ProdutosJpaController(emf);
+        ProdutosJpaController ctrl = new ProdutosJpaController(emf);
         UsuariosJpaController ctrlUsuarios = new UsuariosJpaController(emf);
+        MovimentosJpaController ctrlMov = new MovimentosJpaController(emf);
         
         ServerSocket serverSocket = null;
         try {
@@ -31,7 +33,7 @@ public class ServidorCadastro {
                
                 Socket socket = serverSocket.accept();
              
-                CadastroThread cadastroThread = new CadastroThread(ctrlProdutos, ctrlUsuarios, socket);
+                CadastroThread cadastroThread = new CadastroThread(ctrl, ctrlUsuarios, ctrlMov, socket);
                 cadastroThread.start();
             } catch (IOException e) {
                 e.printStackTrace();
